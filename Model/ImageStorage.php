@@ -42,9 +42,8 @@ class ImageStorage extends FileStorage {
  *
  * @return boolean true on success
  */
-	public function beforeSave($options) {
+	public function beforeSave($options = array()) {
 		parent::beforeSave($options);
-
 		$this->log('beforeSave called', 'imageupload');
 		return true;
 	}
@@ -75,8 +74,8 @@ class ImageStorage extends FileStorage {
  *
  * @return boolean
  */
-	public function beforeDelete() {
-		if (!parent::beforeDelete()) {
+	public function beforeDelete($cascade = true) {
+		if (!parent::beforeDelete($cascade)) {
 			return false;
 		}
 
@@ -128,7 +127,7 @@ class ImageStorage extends FileStorage {
  * @param array $results
  * @return array
  */
-	public function afterFind($results) {
+	public function afterFind($results, $primary = false) {
 		return $results;
 	}
 
@@ -162,10 +161,10 @@ class ImageStorage extends FileStorage {
 /**
  * Creates the versions of the image uploads
  *
- * @param string 
- * @param string 
- * @param string 
- * @param string 
+ * @param string
+ * @param string
+ * @param string
+ * @param string
  * @return
  */
 	public function createVersions($data = array(), $format = 'jpg') {
@@ -173,6 +172,9 @@ class ImageStorage extends FileStorage {
 			$data = $this->data;
 		}
 		extract($data[$this->alias]);
+		if (empty($model)) {
+			$model = $this->alias;
+		}
 
 		$filename = $this->stripUuid($id);
 		$sizes = Configure::read('Media.imageSizes.' . $model);

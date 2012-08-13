@@ -49,7 +49,7 @@ class FileStorage extends FileStorageAppModel {
  *
  * @return boolean true on success
  */
-	public function beforeSave($options) {
+	public function beforeSave($options = array()) {
 		if (!empty($this->data[$this->alias]['file']['tmp_name'])) {
 			$File = new File($this->data[$this->alias]['file']['tmp_name']);
 			$this->data[$this->alias]['filesize'] = $File->size();
@@ -57,9 +57,10 @@ class FileStorage extends FileStorageAppModel {
 		}
 		if (!empty($this->data[$this->alias]['file']['name'])) {
 			$this->data[$this->alias]['extension'] = $this->fileExtension($this->data[$this->alias]['file']['name']);
-		}
-		if (!empty($this->data[$this->alias]['file']['name'])) {
 			$this->data[$this->alias]['filename'] = $this->data[$this->alias]['file']['name'];
+		}
+		if (empty($this->data[$this->alias]['path'])) {
+			$this->data[$this->alias]['path'] = 'misc';
 		}
 		if (empty($this->data[$this->alias]['adapter'])) {
 			$this->data[$this->alias]['adapter'] = 'Local';
@@ -72,7 +73,7 @@ class FileStorage extends FileStorageAppModel {
  *
  * @return boolean
  */
-	public function beforeDelete() {
+	public function beforeDelete($cascade = true) {
 		$this->record = $this->find('first', array(
 			'contain' => array(),
 			'conditions' => array(
@@ -96,7 +97,7 @@ class FileStorage extends FileStorageAppModel {
  *
  * This method is thought to be used to generate tmp file locations for use cases
  * like audio or image process were you need copies of a file and want to avoid
- * conflicts. By default the tmp file is generated using cakes TMP constant + 
+ * conflicts. By default the tmp file is generated using cakes TMP constant +
  * folder if passed and a uuid as filename.
  *
  * @param string $folder
@@ -128,7 +129,7 @@ class FileStorage extends FileStorageAppModel {
 	}
 
 /**
- * 
+ *
  */
 	public function fsPath($type, $string, $idFolder = true) {
 		$string = str_replace('-', '', $string);
